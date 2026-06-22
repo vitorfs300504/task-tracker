@@ -1,9 +1,7 @@
 // src/app/page.tsx
-// Página principal da aplicação — gerencia o estado global e conecta todos os componentes
-
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, } from "react";
 import { Task, TaskStats } from "@/lib/types";
 import TaskList from "@/components/TaskList";
 import TaskForm from "@/components/TaskForm";
@@ -17,8 +15,7 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  // Busca todas as tarefas e estatísticas da API
-  const fetchData = useCallback(async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const [tasksRes, statsRes] = await Promise.all([
@@ -34,31 +31,27 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, []);
 
-  // Deleta uma tarefa pelo ID
   const handleDelete = async (id: string) => {
     await fetch(`/api/tasks/${id}`, { method: "DELETE" });
     fetchData();
   };
 
-  // Abre o formulário para editar uma tarefa existente
   const handleEdit = (task: Task) => {
     setEditingTask(task);
     setShowForm(true);
   };
 
-  // Fecha o formulário e limpa o estado de edição
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingTask(null);
   };
 
-  // Chamado após criar ou editar uma tarefa com sucesso
   const handleSuccess = () => {
     handleCloseForm();
     fetchData();
@@ -66,7 +59,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      {/* Header */}
       <header className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -81,12 +73,8 @@ export default function Home() {
           </button>
         </div>
       </header>
-
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        {/* Painel de estatísticas */}
         {stats && <StatsPanel stats={stats} />}
-
-        {/* Lista de tarefas */}
         {loading ? (
           <LoadingState />
         ) : (
@@ -94,11 +82,10 @@ export default function Home() {
             tasks={tasks}
             onDelete={handleDelete}
             onEdit={handleEdit}
+            onCreateTask={() => setShowForm(true)}
           />
         )}
       </div>
-
-      {/* Modal do formulário */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
